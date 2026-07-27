@@ -1,0 +1,345 @@
+/* uvfits viewer — light/dark surfaces from one set of role variables */
+.root {
+  --surface: #fcfcfb;
+  --plane: #f9f9f7;
+  --primary: #0b0b0b;
+  --secondary: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --accent: #2a78d6;
+  --border: rgba(11, 11, 11, 0.10);
+  /* serif display face for the main title and tab labels (font stack shared
+     with hearing-simulator-full.html); theme-independent, so declared once */
+  --serif: Charter, "Bitstream Charter", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  color-scheme: light;
+}
+.root.theme-warm {
+  --surface: #faf5ec;
+  --plane: #f4ede0;
+  --primary: #1c1813;
+  --secondary: #544c3d;
+  --muted: #8a8271;
+  --grid: #e7dfcf;
+  --axis: #cdc3ae;
+  --accent: #2a78d6;
+  --border: rgba(28, 24, 19, 0.12);
+  color-scheme: light;
+}
+.root.theme-teal {
+  --surface: #0f2027;
+  --plane: #0a171c;
+  --primary: #f2fafc;
+  --secondary: #a9c8ce;
+  --muted: #7d9ba3;
+  --grid: #1c3742;
+  --axis: #2b4c58;
+  --accent: #3987e5;
+  --border: rgba(242, 250, 252, 0.12);
+  color-scheme: dark;
+}
+.root.theme-dark {
+  --surface: #1a1a19;
+  --plane: #0d0d0d;
+  --primary: #ffffff;
+  --secondary: #c3c2b7;
+  --muted: #898781;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --accent: #3987e5;
+  --border: rgba(255, 255, 255, 0.10);
+  color-scheme: dark;
+}
+
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #f9f9f7;
+}
+/* the theme variables are declared on .root, so colour has to be set there too:
+   `body { color: var(--primary) }` cannot see them and falls back to black */
+.root {
+  --content: 1600px;   /* centred column; the plane shows in the side bands */
+  min-height: 100vh; background: var(--plane); padding: 0 0 40px;
+  color: var(--primary);
+}
+/* header, global controls and the tab bar span the full window; only the plot
+   area is held to a centred column, so the empty side bands start below the
+   tabs rather than framing the whole page */
+.tab-body, .footer {
+  max-width: var(--content); margin-left: auto; margin-right: auto;
+}
+
+/* ---------------------------------------------------------------- header */
+.header {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  padding: 14px 22px; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 20;
+}
+.title {
+  font-family: var(--serif);
+  font-size: 30px; font-weight: 650; margin: 0; letter-spacing: -0.01em;
+  color: var(--primary);
+}
+.subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.stats { display: flex; gap: 22px; flex-wrap: wrap; margin-left: auto; }
+.stat { display: flex; flex-direction: column; gap: 1px; }
+.stat span { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.stat b { font-size: 13px; font-weight: 600; color: var(--secondary); font-variant-numeric: tabular-nums; }
+
+/* -------------------------------------------------------------- controls */
+.controls {
+  display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;
+  padding: 12px 22px; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.controls.sub { background: transparent; border-bottom: 1px dashed var(--border); padding: 10px 2px 12px; }
+.ctl { display: flex; flex-direction: column; gap: 5px; }
+.ctl-label {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--muted); font-weight: 600;
+}
+.checks { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+/* Dash gives checklist labels a hard-coded dark navy; force the theme ink so
+   they stay readable on a dark surface */
+.checks label { display: flex; align-items: center; gap: 4px; cursor: pointer;
+                color: var(--secondary) !important; }
+.hint { font-size: 11.5px; color: var(--muted); align-self: flex-end; padding-bottom: 6px; }
+.ctl-head { display: flex; align-items: baseline; gap: 8px; }
+.ctl-count { font-size: 11px; color: var(--muted); font-weight: 500;
+             font-variant-numeric: tabular-nums; text-transform: none;
+             letter-spacing: 0; }
+
+.btn {
+  font: inherit; font-size: 12px; padding: 6px 11px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--secondary); cursor: pointer; align-self: flex-end;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.ghost { background: transparent; }
+
+/* dcc.Input skinning (appearance:none removes the native control chrome that
+   made the UT text boxes look different from the S/N number box) */
+input[type="number"], input[type="text"] {
+  font: inherit; font-size: 13px; padding: 7px 9px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--primary);
+  width: 100%; box-sizing: border-box;
+  -webkit-appearance: none; appearance: none;
+}
+input::placeholder { color: var(--muted); }
+
+/* dcc.Dropdown (dash 3+ renders `dash-dropdown*`, not the old react-select
+   `Select-*`; the previous rules were dead, which is why the closed control
+   stayed white on a dark surface).  The container element carries the class
+   `dash-dropdown`; the popup is `dash-dropdown-content`.  Scoped to .root so
+   the theme variables resolve. */
+.root .dash-dropdown,
+.root .dash-dropdown-content,
+.root .dash-dropdown-search {
+  background: var(--surface) !important;
+  color: var(--primary) !important;
+  border-color: var(--border) !important;
+}
+.root .dash-dropdown { border: 1px solid var(--border) !important;
+                       border-radius: 7px !important; }
+.root .dash-dropdown-value,
+.root .dash-dropdown-value-item,
+.root .dash-dropdown-search { color: var(--primary) !important; }
+.root .dash-dropdown-content {
+  border: 1px solid var(--border) !important; border-radius: 7px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+}
+.root .dash-dropdown-option { background: var(--surface) !important;
+                              color: var(--secondary) !important; }
+.root .dash-dropdown-option:hover,
+.root .dash-dropdown-option[aria-selected="true"],
+.root .dash-dropdown-option[data-selected="true"] {
+  background: var(--plane) !important; color: var(--primary) !important;
+}
+.root .dash-dropdown-trigger-icon,
+.root .dash-dropdown-search-icon,
+.root .dash-dropdown-clear { color: var(--muted) !important; }
+
+/* ------------------------------------------------------------------ tabs */
+.tabs { border-bottom: 1px solid var(--border) !important; background: var(--surface); }
+.tab {
+  background: var(--surface) !important; border: none !important;
+  color: var(--muted) !important; font-family: var(--serif) !important;
+  font-size: 13px !important; padding: 11px 18px !important;
+  border-bottom: 2px solid transparent !important;
+}
+.tab-sel {
+  color: var(--primary) !important; font-weight: 600 !important;
+  font-family: var(--serif) !important;
+  border-bottom: 2px solid var(--accent) !important; background: var(--surface) !important;
+}
+.tab-body { padding: 14px 22px 0; }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 1000px) { .row2 { grid-template-columns: 1fr; } }
+
+/* no outline around plots -- the surface fill alone separates them from the
+   page; a border read as a hard "white contour" on the light themes */
+.graph {
+  background: var(--surface); border: none;
+  border-radius: 10px; margin: 12px 0; overflow: hidden;
+}
+
+/* ------------------------------------------------------------- info card */
+.info-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 13px 16px; margin: 4px 0 12px;
+}
+.info-empty { font-size: 12px; color: var(--muted); }
+.info-head {
+  font-size: 13px; font-weight: 650; color: var(--primary); margin-bottom: 9px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 7px 22px; }
+.kv { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; }
+.kv .k { color: var(--muted); }
+.kv b { color: var(--secondary); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.details { margin: 6px 0 14px; }
+.details summary {
+  font-size: 12.5px; color: var(--secondary); cursor: pointer; padding: 7px 0;
+}
+
+.table-wrap { margin: 10px 0; }
+.footer { padding: 16px 22px 0; font-size: 11.5px; color: var(--muted); }
+
+.dash-spreadsheet-container .dash-spreadsheet-inner input { color: var(--primary) !important; }
+.dash-filter input { color: var(--primary) !important; }
+
+/* range slider + export controls */
+.rc-slider { margin: 6px 4px 2px; }
+.rc-slider-rail { background: var(--grid) !important; }
+.rc-slider-track { background: var(--accent) !important; }
+.rc-slider-handle { border-color: var(--accent) !important; background: var(--surface) !important; }
+.rc-slider-dot { border-color: var(--grid) !important; background: var(--surface) !important; }
+.rc-slider-mark-text { color: var(--muted) !important; font-size: 10px !important; }
+.rc-slider-mark-text-active { color: var(--secondary) !important; }
+.export-row { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+.export-row .fmt { width: 88px; }
+.export-row .btn { align-self: center; }
+
+/* per-antenna toggles and the HH:MM range boxes */
+.ants { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12px;
+        color: var(--secondary); }
+.ants label { display: inline-flex; align-items: center; gap: 3px; cursor: pointer; }
+.ants input { cursor: pointer; }
+.ut-row { display: flex; align-items: center; gap: 6px; }
+/* match the square-cornered S/N box (Dash forces radius 0 there); the rounded
+   corners were the "strange" look */
+.ut-row input { text-align: center; font-variant-numeric: tabular-nums;
+                border-radius: 0; }
+.ut-row .dash { color: var(--muted); }
+
+/* ------------------------------------------------------------------ *
+ * File loading: the drag-and-drop zone (landing) and its slim bar    *
+ * (once a file is loaded).  These sit OUTSIDE .root, so they can't    *
+ * use the theme variables and carry their own light/dark colours.    *
+ * ------------------------------------------------------------------ */
+.uploader { box-sizing: border-box; cursor: pointer; text-align: center;
+            transition: border-color .15s, background .15s; }
+.uploader-inner { display: flex; align-items: center; justify-content: center; }
+.uploader-icon { font-weight: 700; }
+
+/* landing: a full-height centred drop panel */
+#page.landing { display: flex; align-items: center; justify-content: center;
+                min-height: 100vh; padding: 24px; }
+#page.landing .uploader {
+  width: min(560px, 90vw); padding: 64px 40px; border-radius: 16px;
+  border: 2px dashed #b9c4d6; background: #ffffff;
+  box-shadow: 0 6px 30px rgba(11, 11, 11, 0.06); }
+#page.landing .uploader:hover { border-color: #2a78d6; background: #f7fbff; }
+#page.landing .uploader-inner { flex-direction: column; gap: 8px; }
+#page.landing .uploader-icon { font-size: 40px; color: #2a78d6; }
+#page.landing .uploader-title { font-size: 20px; font-weight: 600; color: #1c1c1c; }
+#page.landing .uploader-sub { font-size: 14px; color: #6b7280; }
+
+/* loaded: shrink the very same element to a slim bar above the dashboard */
+#page.loaded .uploader {
+  padding: 7px 14px; border: 1px solid rgba(11, 11, 11, 0.10);
+  border-bottom: none; background: #f2f4f8; }
+#page.loaded .uploader:hover { background: #e8eefb; border-color: #2a78d6; }
+#page.loaded .uploader-inner { flex-direction: row; gap: 8px; font-size: 12.5px; }
+#page.loaded .uploader-icon { color: #2a78d6; }
+#page.loaded .uploader-title { font-weight: 600; color: #33383f; }
+#page.loaded .uploader-sub { color: #7a828c; }
+
+.load-error { margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+              border: 1px solid #e6b3b3; background: #fff5f5; text-align: center; }
+.load-error .err-title { font-weight: 600; color: #a12b2b; font-size: 16px; }
+.load-error .err-msg { color: #7a2f2f; font-size: 13px; margin-top: 6px;
+                       word-break: break-word; }
+.load-error .err-sub { color: #9a6060; font-size: 12px; margin-top: 8px; }
+
+@media (prefers-color-scheme: dark) {
+  #page.landing .uploader { border-color: #35506e; background: #14171c;
+                            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4); }
+  #page.landing .uploader:hover { border-color: #3987e5; background: #171d26; }
+  #page.landing .uploader-title { color: #f2f2f0; }
+  #page.landing .uploader-sub { color: #9aa2ad; }
+  #page.loaded .uploader { background: #15181d;
+                           border-color: rgba(255, 255, 255, 0.10); }
+  #page.loaded .uploader:hover { background: #1a2230; }
+  #page.loaded .uploader-title { color: #e6e6e4; }
+  .load-error { background: #241213; border-color: #6e2f2f; }
+  .load-error .err-title { color: #f0a3a3; }
+  .load-error .err-msg { color: #d99; }
+}
+
+/* ------------------------------------------------------------------ *
+ * Comparison mode: the per-dataset legend in the header, and the     *
+ * dataset tag on a clicked record.  The swatch colours mirror the    *
+ * plot palette (figures.PALETTE) and switch with the theme so the    *
+ * header key always matches the overlaid points.                     *
+ * ------------------------------------------------------------------ */
+.ds-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-left: auto;
+             align-items: flex-start; max-width: 70%; }
+.ds-chip { display: flex; align-items: center; gap: 8px; }
+.ds-sw { width: 13px; height: 13px; border-radius: 3px; flex: none;
+         box-shadow: 0 0 0 1px var(--border); }
+.ds-text { display: flex; flex-direction: column; gap: 1px; line-height: 1.15; }
+.ds-name { font-size: 12.5px; color: var(--primary); }
+.ds-meta { font-size: 10.5px; color: var(--muted); }
+.info-dataset { font-size: 11px; font-weight: 600; color: var(--secondary);
+                text-transform: uppercase; letter-spacing: .05em;
+                margin-bottom: 2px; }
+
+/* per-dataset swatch colours — light/warm palette (default) ... */
+.ds-sw-0 { background: #2a78d6; } .ds-sw-1 { background: #eb6834; }
+.ds-sw-2 { background: #1baf7a; } .ds-sw-3 { background: #eda100; }
+.ds-sw-4 { background: #e87ba4; } .ds-sw-5 { background: #008300; }
+.ds-sw-6 { background: #4a3aa7; } .ds-sw-7 { background: #e34948; }
+/* ... and the dark/teal palette */
+.root.theme-dark .ds-sw-0, .root.theme-teal .ds-sw-0 { background: #3987e5; }
+.root.theme-dark .ds-sw-1, .root.theme-teal .ds-sw-1 { background: #d95926; }
+.root.theme-dark .ds-sw-2, .root.theme-teal .ds-sw-2 { background: #199e70; }
+.root.theme-dark .ds-sw-3, .root.theme-teal .ds-sw-3 { background: #c98500; }
+.root.theme-dark .ds-sw-4, .root.theme-teal .ds-sw-4 { background: #d55181; }
+.root.theme-dark .ds-sw-5, .root.theme-teal .ds-sw-5 { background: #008300; }
+.root.theme-dark .ds-sw-6, .root.theme-teal .ds-sw-6 { background: #9085e9; }
+.root.theme-dark .ds-sw-7, .root.theme-teal .ds-sw-7 { background: #e66767; }
+
+/* "start over" button — hidden on the landing page, a small control at the top
+   right of the slim upload bar once files are loaded (clears the whole set).
+   Sits outside .root, so like the upload bar it follows the OS colour scheme. */
+#page { position: relative; }
+.reset-btn { display: none; }
+#page.loaded .reset-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  position: absolute; top: 6px; right: 12px; z-index: 30;
+  font: inherit; font-size: 11px; font-weight: 600; padding: 4px 10px;
+  border-radius: 6px; border: 1px solid rgba(11, 11, 11, 0.15);
+  background: #ffffff; color: #55606e; cursor: pointer;
+}
+#page.loaded .reset-btn:hover { border-color: #d1495b; color: #d1495b;
+                                background: #fff5f5; }
+@media (prefers-color-scheme: dark) {
+  #page.loaded .reset-btn { background: #1b1f27; color: #aab3c0;
+                            border-color: rgba(255, 255, 255, 0.15); }
+  #page.loaded .reset-btn:hover { background: #241417; color: #f0a3a3; }
+}

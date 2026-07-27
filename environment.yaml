@@ -1,0 +1,26 @@
+# Conda environment for the VLBI uvfits viewer.
+#
+#   conda env create -f environment.yaml      # create it once
+#   conda activate vlbiviewer                 # then use it
+#
+# Tested on python 3.11 with dash 4.4, plotly 6.9, numpy 2.4, pandas 3.0,
+# astropy 8.0.  The floors below are the earliest versions whose APIs the app
+# relies on; conda-forge will pick recent builds that satisfy them.
+name: vlbiviewer
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  # --- core: reading the file and building the dashboard ---
+  - numpy>=1.26
+  - pandas>=2.0
+  - astropy>=5.3          # reads the uvfits
+  - plotly>=5.20          # the figures
+  - dash>=2.16            # the web app (uses app.run)
+  # --- static export (the "save as PNG/PDF/SVG" button) ---
+  # kaleido renders through a headless Chrome.  It is optional: if you only
+  # ever export to interactive HTML you don't need it at all.
+  # NOTE for Linux users: kaleido's Chrome also needs the system library
+  # `libgbm`, which is Linux-only.  Install it separately if a PNG/PDF/SVG
+  # export comes out blank:  conda install -c conda-forge libgbm
+  - python-kaleido
