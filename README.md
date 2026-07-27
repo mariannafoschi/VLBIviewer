@@ -6,7 +6,7 @@ The dashboard allows to inspect a single dataset or to compar multiple ones.
 
 It is also possible to save the displayed figures with the current plotting settings.
 
-### User Guide
+## User Guide
 
 ##### Create the environment
 
@@ -35,7 +35,7 @@ python vlbi_viewer.py obs1.uvfits obs2.uvfits     # loads multiple files
 python vlbi_viewer.py --no-browser                # start the server only
 ```
 
-### Tabs
+## Tabs
 
 - **Overview** — a summary page with: uv coverage, amplitude vs uv distance, amplitude and phase vs time for all baselines, closure phase and log closure amplitude vs time.
 - **Visibilities** — pick any subset of baselines and stack the panels you want (amplitude, phase, σ amplitude, σ phase, S/N, real, imaginary) againstnUT time or uv distance; overlay all baselines or give each its own panel. A collapsible uv-coverage panel highlights the current selection.
@@ -43,7 +43,7 @@ python vlbi_viewer.py --no-browser                # start the server only
 - **Closure amplitudes** — log (or linear) closure amplitude vs time.
 - **Table** — the data table, sortable and filterable, with a CSV download.
 
-### Files
+## Files
 
 | file | purpose |
 |---|---|
@@ -54,6 +54,6 @@ python vlbi_viewer.py --no-browser                # start the server only
 | `environment.yaml` | environment with required packages |
 | `launch.command` / `launch.bat` | double-click launchers (macOS-Linux / Windows) |
 
-### Disclaimer
+## Disclaimer
 
 I created the VLBI Viewer tool as an exercise to familiarize myself with AI-based coding. I'm sharing it here because I think it can be useful for other researchers working with VLBI data. I recommend thoroughly checking the code in case the user wants to use any plot made by the VLBI Viewer in a scientific publication.
