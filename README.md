@@ -45,7 +45,7 @@ python vlbi_viewer.py --no-browser                # start the server only
 
 ## Files
 
-| file | purpose |
+| fil | purpose |
 |---|---|
 | `uvdata.py` | reads files and computes data products |
 | `figures.py` | makes figures with plotly |
@@ -60,4 +60,4 @@ I created the VLBI Viewer tool as an exercise to familiarize myself with AI-base
 
 
 
-![VLBI Viewer dashboard, 'Teal' theme](vlbi_viewer.png)
+![VLBI Viewer dashboard, 'Dark' theme](vlbiviewer.png)
