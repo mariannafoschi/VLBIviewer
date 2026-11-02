@@ -53,7 +53,7 @@ https://github.com/user-attachments/assets/84f9e55a-eb2c-4e6e-accd-c36b0028d74d
 
 ## Files
 
-| fil | purpose |
+| file | purpose |
 |---|---|
 | `uvdata.py` | reads files and computes data products |
 | `figures.py` | makes figures with plotly |
