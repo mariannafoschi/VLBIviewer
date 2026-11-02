@@ -57,6 +57,7 @@ python vlbi_viewer.py --no-browser                # start the server only
 ## Disclaimer
 
 I created the VLBI Viewer tool as an exercise to familiarize myself with AI-based coding. I'm sharing it here because I think it can be useful for other researchers working with VLBI data. I recommend thoroughly checking the code in case the user wants to use any plot made by the VLBI Viewer in a scientific publication.
+The code was built using [eht-imaging](https://github.com/achael/eht-imaging/)'s utilities as a reference for data manipulation.
 
 
 
