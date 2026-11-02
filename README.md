@@ -6,6 +6,10 @@ The dashboard allows to inspect a single dataset or to compar multiple ones.
 
 It is also possible to save the displayed figures with the current plotting settings.
 
+
+![VLBI Viewer dashboard, 'Dark' theme](vlbiviewer.png)
+
+
 ## User Guide
 
 ##### Create the environment
@@ -62,11 +66,4 @@ https://github.com/user-attachments/assets/84f9e55a-eb2c-4e6e-accd-c36b0028d74d
 
 I created the VLBI Viewer tool as an exercise to familiarize myself with AI-based coding. I'm sharing it here because I think it can be useful for other researchers working with VLBI data. I recommend thoroughly checking the code in case the user wants to use any plot made by the VLBI Viewer in a scientific publication.
 The code was built using [eht-imaging](https://github.com/achael/eht-imaging/)'s utilities as a reference for data manipulation.
-
-
-
-![VLBI Viewer dashboard, 'Dark' theme](vlbiviewer.png)
-
-
-
 
