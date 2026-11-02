@@ -1,6 +1,13 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+__pycache__/*
+
+# Example Data
+data/*
 
 # macOS
 .DS_Store
 */.DS_Store
+
+# Graphics
+vlbiviewer2.png
+VLBIViewer.mov
