@@ -63,6 +63,11 @@ I created the VLBI Viewer tool as an exercise to familiarize myself with AI-base
 ![VLBI Viewer dashboard, 'Dark' theme](vlbiviewer.png)
 
 
-
 ## Demo
+
+https://github.com/user-attachments/assets/84f9e55a-eb2c-4e6e-accd-c36b0028d74d
+
+
+
+
 
