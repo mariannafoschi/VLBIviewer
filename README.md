@@ -43,6 +43,10 @@ python vlbi_viewer.py --no-browser                # start the server only
 - **Closure amplitudes** — log (or linear) closure amplitude vs time.
 - **Table** — the data table, sortable and filterable, with a CSV download.
 
+## Demo
+
+https://github.com/user-attachments/assets/84f9e55a-eb2c-4e6e-accd-c36b0028d74d
+
 ## Files
 
 | fil | purpose |
@@ -62,12 +66,6 @@ The code was built using [eht-imaging](https://github.com/achael/eht-imaging/)'s
 
 
 ![VLBI Viewer dashboard, 'Dark' theme](vlbiviewer.png)
-
-
-## Demo
-
-https://github.com/user-attachments/assets/84f9e55a-eb2c-4e6e-accd-c36b0028d74d
-
 
 
 
